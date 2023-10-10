@@ -38,4 +38,32 @@ describe('login page', () => {
       cy.url().should('not.eq', `${baseUrl}/inventory.html`);
     });
   });
+
+  describe('validation failure feedback', () => {
+    it('should not show any errors before user input', () => {
+      cy.visit('/');
+      cy.get('#user-name').should('not.have.class', 'error');
+      cy.get('#password').should('not.have.class', 'error');
+      cy.get('.error-message-container').children().should('have.length', 0);
+    });
+
+    it('should provide feedback when account details are invalid', () => {
+      cy.visit('/').login('invalid_username', 'invalid_password');
+      cy.get('#user-name').should('have.class', 'error');
+      cy.get('#password').should('have.class', 'error');
+      cy.get('.error-message-container')
+        .children()
+        .should('have.length.greaterThan', 0);
+    });
+
+    it('should prompt user when no username is provided', () => {
+      cy.visit('/').login('', validPassword);
+      cy.contains('Username is required');
+    });
+
+    it('should prompt user when no username is provided', () => {
+      cy.visit('/').login(validUsername, '');
+      cy.contains('Password is required');
+    });
+  });
 });
