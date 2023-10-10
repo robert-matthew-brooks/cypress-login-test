@@ -21,6 +21,14 @@ describe('login page', () => {
       cy.visit('/');
       cy.get('#password').invoke('attr', 'type').should('eq', 'password');
     });
+
+    it('should submit the form using the {enter} key', () => {
+      cy.visit('/');
+      cy.get('#user-name').type(validUsername);
+      cy.get('#password').type(`${validPassword}{enter}`);
+      cy.url().should('eq', `${baseUrl}/inventory.html`);
+      cy.get('#logout_sidebar_link');
+    });
   });
 
   describe('redirect', () => {
