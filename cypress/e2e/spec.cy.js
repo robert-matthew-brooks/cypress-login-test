@@ -9,11 +9,18 @@ Cypress.Commands.add('login', (username, password) => {
 });
 
 describe('login page', () => {
-  it('should display login form elements', () => {
-    cy.visit('/');
-    cy.get('#user-name');
-    cy.get('#password');
-    cy.get('#login-button');
+  describe('form elements', () => {
+    it('should display login form elements', () => {
+      cy.visit('/');
+      cy.get('#user-name');
+      cy.get('#password');
+      cy.get('#login-button');
+    });
+
+    it('should not display the password on screen', () => {
+      cy.visit('/');
+      cy.get('#password').invoke('attr', 'type').should('eq', 'password');
+    });
   });
 
   describe('redirect', () => {
@@ -36,6 +43,20 @@ describe('login page', () => {
     it('should not allow access to the inventory page before the user has logged in', () => {
       cy.visit('/inventory.html', { failOnStatusCode: false });
       cy.url().should('not.eq', `${baseUrl}/inventory.html`);
+    });
+  });
+
+  describe('cookies', () => {
+    it('should create a session cookie with username on successful login', () => {
+      cy.visit('/').login(validUsername, validPassword);
+      cy.getCookie('session-username').its('value').should('eq', validUsername);
+    });
+
+    it('should remove the cookie on logout', () => {
+      cy.visit('/').login(validUsername, validPassword);
+      cy.get('#react-burger-menu-btn').click();
+      cy.get('#logout_sidebar_link').click();
+      cy.getCookie('session-username').should('not.exist');
     });
   });
 
